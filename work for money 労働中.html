@@ -1,11 +1,83 @@
-<script src="work for money 労働中.js"></script>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Timer with Increasing Prize</title>
+</head>
+<body>
+	<h1>Timer with Increasing Prize</h1>
+	<label for="hours">Hours:</label>
+	<input type="number" id="hours" value="0" min="0">
+	<label for="minutes">Minutes:</label>
+	<input type="number" id="minutes" value="0" min="0" max="59">
+	<label for="seconds">Seconds:</label>
+	<input type="number" id="seconds" value="0" min="0" max="59">
+	<br><br>
+	<label for="hourly-wage">Hourly Wage:</label>
+	<input type="number" id="hourly-wage" value="1000" min="0">
+	<br><br>
+	<button onclick="startTimer()">Start Timer</button>
+	<button onclick="stopTimer()">Stop Timer</button>
+	<br><br>
+	<div id="timer"></div>
+	<div id="prize"></div>
 
-<label for="time">Time limit (in seconds):</label>
-<input type="number" id="time" value="60">
-<br>
-<label for="prize">Prize increase per second:</label>
-<input type="number" id="prize" value="10">
-<br>
-<p id="timer">01:00</p>
-<p id="prize-display">$0</p>
-<button onclick="startTimer()">Start</button>
+	<script>
+		let timerInterval;
+		let remainingTime;
+		let startTime;
+		let prize = 0;
+
+		function startTimer() {
+			// Get user input values
+			const hoursInput = parseInt(document.getElementById("hours").value);
+			const minutesInput = parseInt(document.getElementById("minutes").value);
+			const secondsInput = parseInt(document.getElementById("seconds").value);
+			const hourlyWage = parseInt(document.getElementById("hourly-wage").value);
+
+			// Calculate remaining time in milliseconds
+			remainingTime = (hoursInput * 3600 + minutesInput * 60 + secondsInput) * 1000;
+
+			// Get current time in milliseconds
+			startTime = new Date().getTime();
+
+			// Clear previous interval (if any)
+			clearInterval(timerInterval);
+
+			// Start new interval
+			timerInterval = setInterval(function() {
+				// Get elapsed time in milliseconds
+				const elapsedTime = new Date().getTime() - startTime;
+
+				// Calculate remaining time in milliseconds
+				const remainingTimeInMillis = remainingTime - elapsedTime;
+
+				// Check if timer has reached zero
+				if (remainingTimeInMillis < 0) {
+					stopTimer();
+					return;
+				}
+
+				// Calculate remaining time in hours, minutes, and seconds
+				const hours = Math.floor(remainingTimeInMillis / 3600000);
+				const minutes = Math.floor((remainingTimeInMillis % 3600000) / 60000);
+				const seconds = Math.floor((remainingTimeInMillis % 60000) / 1000);
+
+				// Update timer display
+				const timerDisplay = document.getElementById("timer");
+				timerDisplay.innerHTML = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+
+				// Calculate prize
+				prize = Math.floor((elapsedTime / 1000) * (hourlyWage / 3600));
+
+				// Update prize display
+				const prizeDisplay = document.getElementById("prize");
+				prizeDisplay.innerHTML = `Prize: ${prize}`;
+			}, 1000);
+		}
+
+		function stopTimer() {
+			clearInterval(timerInterval);
+		}
+	</script>
+</html>
